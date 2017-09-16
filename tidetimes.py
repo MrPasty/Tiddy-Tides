@@ -44,6 +44,8 @@ next_hightide12H = ""
 next_lowtide12H = ""
 last_tidetype = ""
 last_tidetime = ""
+last_lowtidetime = ""
+last_hightidetime = ""
 hightides = 0
 lowtides = 0
 
