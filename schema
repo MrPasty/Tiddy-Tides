@@ -1,0 +1,117 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "CurrentState",
+      "samples": [
+        "what is the tide doing",
+        "what its doing"
+      ],
+      "slots": []
+    },
+    {
+      "name": "NoIntent",
+      "samples": [
+        "no",
+        "go away",
+        "nope"
+      ],
+      "slots": []
+    },
+    {
+      "name": "TideIntent",
+      "samples": [
+        "what time is {TideState} tide",
+        "what time is {TideState} tide today",
+        "when is {TideState} tide",
+        "when is {TideState} tide today",
+        "when is the next {TideState} tide",
+        "when the next {TideState} tide is"
+      ],
+      "slots": [
+        {
+          "name": "TideState",
+          "type": "List_of_tides",
+          "samples": [
+            "{TideState}"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "YesIntent",
+      "samples": [
+        "yes",
+        "sure",
+        "yep"
+      ],
+      "slots": []
+    }
+  ],
+  "types": [
+    {
+      "name": "List_of_tides",
+      "values": [
+        {
+          "id": null,
+          "name": {
+            "value": "low",
+            "synonyms": []
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "high",
+            "synonyms": []
+          }
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "Elicit.Intent-TideIntent.IntentSlot-TideState",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Please specify if you want to know the high or low tide"
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "TideIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "TideState",
+            "type": "List_of_tides",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-TideIntent.IntentSlot-TideState"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
