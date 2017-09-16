@@ -14,9 +14,9 @@ time12h = time.strftime("%I:%M %p")
 timestrut = time.strptime(time12h, '%I:%M %p')
 currenttime = time.strftime('%H:%M', timestrut)
 
-
+# Tides are taken from https://www.tidetimes.org.uk, please support their awesome service.
 # Read tide times in to variables to use later - note can pass a date on end of url like ..tide-times-20170918
-soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/st-germans-tide-times').read(), 'html5lib')
+soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/<your river here>').read(), 'html5lib')
 tableState = soup.find("table", {"id": "tidetimes"})
 
 high =[]
