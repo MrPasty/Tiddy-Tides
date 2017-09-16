@@ -58,8 +58,6 @@ for h in high:
                 i = datetime.strptime(i, "%H:%M")
                 i = i.strftime("%I:%M %p")
                 last_lowtidetime = i
-                #last_tidetime = i
-                #last_tidetype = "low"
         break
 
 for l in low:
@@ -73,8 +71,6 @@ for l in low:
                 i = datetime.strptime(i, "%H:%M")
                 i = i.strftime("%I:%M %p")
                 last_hightidetime = i
-                #last_tidetime = i
-                #last_tidetype = "high"
         break
 
 
@@ -103,7 +99,6 @@ else:
 
 
 # Variables to use next_hightide12H next_lowtide12H tide_state last_tide last_tidetime
-
 
 app = Flask(__name__)
 ask = Ask(app, "/tides")
