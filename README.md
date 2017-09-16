@@ -1,5 +1,5 @@
 # Tiddy-Tides
-Small Alexa skill to get the tides of a specific river.  Could be adapted to get the tide of another location or even extended to give the user the option to choose a location.
+Small Alexa skill to get the tides of a specific river.  Could be adapted to give the user the option to choose a location.
 
 You can activate the skill (once set up in Amazon developer portal) by saying:
 
