@@ -37,6 +37,9 @@ for row in tableState.findAll('tr')[2:]:
     except Exception as e:
         pass
 
+ltnum = len(low)
+htnum = len(high)
+    
 # Populate the next high/low tide variable
 next_hightide24H = ""
 next_lowtide24H = ""
@@ -75,8 +78,20 @@ for l in low:
                 last_hightidetime = i
         break
 
+# Catch if we have not got last_hightidetime or last_lowtidetime - i.e happens the next day
+if last_hightidetime == "":
+    if htnum == 2:
+        last_hightidetime = high[1]
+    else:
+        last_hightidetime = high[0]
 
-# Set last tide here
+if last_lowtidetime == "":
+    if ltnum == 2:
+        last_lowtidetime = low[1]
+    else:
+        last_lowtidetime = low[0]
+
+# Set last tide here and check next tide
 if last_hightidetime < last_lowtidetime:
     last_tidetype = "low"
     last_tidetime = last_lowtidetime
@@ -84,6 +99,14 @@ else:
     last_tidetype = "high"
     last_tidetime = last_hightidetime
 
+if last_tidetype == "high":
+    if next_lowtide12H == "":
+        next_lowtide12H = "early tomorrow morning"
+
+if last_tidetype == "low":
+    if next_hightide12H == "":
+        next_hightide12H = "early tomorrow morning"
+    
 # Set current tide state variable
 if next_hightide12H == "":
     next_hightide12H = "High tide was at " +  last_tidetime + " so is now on its way out,  reaching low tide by " + next_lowtide12H
