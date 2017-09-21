@@ -1,6 +1,6 @@
+from datetime import datetime, time
 from flask import Flask
 from flask_ask import Ask, statement, question, session
-from datetime import datetime, time
 from bs4 import BeautifulSoup
 import urllib
 import json
@@ -13,117 +13,157 @@ import unidecode
 time12h = time.strftime("%I:%M %p")
 timestrut = time.strptime(time12h, '%I:%M %p')
 currenttime = time.strftime('%H:%M', timestrut)
+tides = []
 
-# Tides are taken from https://www.tidetimes.org.uk, please support their awesome service.
 # Read tide times in to variables to use later - note can pass a date on end of url like ..tide-times-20170918
-soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/<your river here>').read(), 'html5lib')
+soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/<YOUR RIVER HERE>').read(), 'html5lib')
 tableState = soup.find("table", {"id": "tidetimes"})
-
-high =[]
-low =[]
 
 for row in tableState.findAll('tr')[2:]:
     col = row.findAll('td')
-
     try:
         tideType = col[0].string.strip()
-
         if (tideType == "High Tide") :
             tideTime = col[1].string.strip()
-            high.append(tideTime)
+            tides.append(tideTime + "#" + "high")
         if (tideType == "Low Tide") :
             tideTime = col[1].string.strip()
-            low.append(tideTime)
+            tides.append(tideTime + "#" + "low")
     except Exception as e:
         pass
 
-ltnum = len(low)
-htnum = len(high)
-    
-# Populate the next high/low tide variable
-next_hightide24H = ""
-next_lowtide24H = ""
-next_hightide12H = ""
-next_lowtide12H = ""
-last_tidetype = ""
+
+time12h = time.strftime("%I:%M %p")
+time24h = time.strptime(time12h, '%I:%M %p')
+currenttime = time.strftime('%H:%M', time24h)
+next_tide = ""
+next_tidetime = ""
+last_tide = ""
 last_tidetime = ""
-last_lowtidetime = ""
-last_hightidetime = ""
-hightides = 0
+next_hightidetime = ""
+next_lowtidetime = ""
+tide_state = ""
 lowtides = 0
+hightides = 0
+tideslen = len(tides)
 
-for h in high:
-    if h >= currenttime:
-        ht = datetime.strptime(h, "%H:%M")
-        ht = ht.strftime("%I:%M %p")
-        next_hightide24H = h
-        next_hightide12H = ht
-        for i in low:
-            if i <= currenttime:
-                i = datetime.strptime(i, "%H:%M")
-                i = i.strftime("%I:%M %p")
-                last_lowtidetime = i
+def convert12H(time24):
+    time12 = datetime.strptime(time24, "%H:%M")
+    time12 = time12.strftime("%I:%M %p")
+    return time12
+
+# as our list is in order we can just itterate it to het next tide
+for tide in tides:
+    tideindex = tides.index(tide)
+    t = tide.split('#',1)
+    tidetime = t[0]
+    tidetype = t[1]
+    t = datetime.strptime(tidetime, '%H:%M')
+    c = datetime.strptime(currenttime, '%H:%M')
+    if t.hour > c.hour:
+        # Set next tide details here
+        next_tide = tidetype
+        next_tidetime = convert12H(tidetime)
         break
+    if t.hour == c.hour:
+        if t.minute > c.minute:
+        # Set next tide details here
+            next_tide = tidetype
+            next_tidetime = tidetime
+            break
 
-for l in low:
-    if l >= currenttime:
-        lt = datetime.strptime(l, "%H:%M")
-        lt = lt.strftime("%I:%M %p")
-        next_lowtide24H =  l
-        next_lowtide12H = lt
-        for i in high:
-            if i <= currenttime:
-                i = datetime.strptime(i, "%H:%M")
-                i = i.strftime("%I:%M %p")
-                last_hightidetime = i
-        break
+if next_tide == "":
+    next_tide = "no futher tides today"
+    lt = tides[tideslen-1]
+    lt = lt.split('#',1)
+    last_tidetime = convert12H(lt[0] )
+    last_tide = lt[1]
+if last_tidetime == "":
+    if next_tide == "high":
+        last_tide = "low"
+        lt = tides[tideindex - 1]
+        lt = lt.split('#', 1)
+        last_tidetime = convert12H(lt[0])
 
-# Catch if we have not got last_hightidetime or last_lowtidetime - i.e happens the next day
-if last_hightidetime == "":
-    if htnum == 2:
-        last_hightidetime = high[1]
     else:
-        last_hightidetime = high[0]
+        last_tide = "high"
+        lt = tides[tideindex - 1]
+        lt = lt.split('#', 1)
+        last_tidetime = convert12H(lt[0])
 
-if last_lowtidetime == "":
-    if ltnum == 2:
-        last_lowtidetime = low[1]
-    else:
-        last_lowtidetime = low[0]
+# Get next high tide
+for tide in tides:
+    t = tide.split('#',1)
+    tidetime = t[0]
+    tidetype = t[1]
+    t = datetime.strptime(tidetime, '%H:%M')
+    c = datetime.strptime(currenttime, '%H:%M')
+    if t.hour > c.hour:
+        if tidetype == "high":
+            next_hightidetime = convert12H(tidetime)
+    if t.hour == c.hour:
+        if t.minute > c.minute:
+            next_hightidetime = convert12H(tidetime)
 
-# Set last tide here and check next tide
-if last_hightidetime < last_lowtidetime:
-    last_tidetype = "low"
-    last_tidetime = last_lowtidetime
-else:
-    last_tidetype = "high"
-    last_tidetime = last_hightidetime
-
-if last_tidetype == "high":
-    if next_lowtide12H == "":
-        next_lowtide12H = "early tomorrow morning"
-
-if last_tidetype == "low":
-    if next_hightide12H == "":
-        next_hightide12H = "early tomorrow morning"
-    
-# Set current tide state variable
-if next_hightide12H == "":
-    next_hightide12H = "High tide was at " +  last_tidetime + " so is now on its way out,  reaching low tide by " + next_lowtide12H
+# No high tide found so populate variable with last high tide
+if next_hightidetime == "":
     hightides = 1
-
-if next_lowtide12H == "":
-    next_lowtide12H = "Low tide was at " +  last_tidetime + " so is now on its way in, reaching high tide by" + next_hightide12H
-    lowtide = 1
-
-# populate the next tide variable
-if last_tidetype == "high":
-    tide_state = "the tide is currently on the way out, ....  and will reach low tide at " + next_lowtide12H
-else:
-    tide_state = "the tide is currently on the way in, ....  and will reach high tide at " + next_hightide12H
+    if "high" in tides[tideslen-1]:
+        next_hightidetime = tides[tideslen-1]
+        next_hightidetime = next_hightidetime.split('#',1)
+        next_hightidetime = "high tide was at " + convert12H(next_hightidetime[0])
+    if "high" in tides[tideslen-2]:
+        next_hightidetime = tides[tideslen-2]
+        next_hightidetime = next_hightidetime.split('#',1)
+        next_hightidetime = "high tide was at " + convert12H(next_hightidetime[0])
 
 
-# Variables to use next_hightide12H next_lowtide12H tide_state last_tide last_tidetime
+# get next low tide
+for tide in tides:
+    t = tide.split('#',1)
+    tidetime = t[0]
+    tidetype = t[1]
+    t = datetime.strptime(tidetime, '%H:%M')
+    c = datetime.strptime(currenttime, '%H:%M')
+    if t.hour > c.hour:
+        if tidetype == "low":
+            next_lowtidetime = convert12H(tidetime)
+    if t.hour == c.hour:
+        if t.minute > c.minute:
+            next_lowtidetime = convert12H(tidetime)
+
+# No low tide found so populate variable with last low tide
+if next_lowtidetime == "":
+    lowtides = 1
+    if "low" in tides[tideslen - 1]:
+        next_lowtidetime = tides[tideslen - 1]
+        next_lowtidetime = next_lowtidetime.split('#', 1)
+        next_lowtidetime = "low tide was at " + convert12H(next_lowtidetime[0])
+    if "low" in tides[tideslen - 2]:
+        next_lowtidetime = tides[tideslen - 2]
+        next_lowtidetime = next_lowtidetime.split('#', 1)
+        next_lowtidetime = "low tide was at " + convert12H(next_lowtidetime[0])
+
+# Get current state
+if last_tide == "high":
+    if hightides > 0:
+        tide_state = "the tide is currently on the way out, ....  and will reach low tide by " + next_lowtidetime  # convert12H(next_lowtidetime)
+    else:
+        tide_state = "the tide is currently on the way out, ....  and will reach low tide by tomorrow"
+if last_tide == "low":
+    if lowtides > 0:
+        tide_state = "the tide is currently on the way in, ....  and will reach high tide by " + next_hightidetime  # convert12H(next_hightidetime)
+    else:
+        tide_state = "the tide is currently on the way in, ....  and will reach high tide by tomorrow"
+
+print("Next tide time = ", next_tidetime)
+print("Next tide = ", next_tide)
+print("last tide = ", last_tide)
+print("Last tide time = ", last_tidetime)
+print("Next high tide time  = ", next_hightidetime)
+print("Next low tide time  = ", next_lowtidetime)
+print("Current state  = ", tide_state)
+
 
 app = Flask(__name__)
 ask = Ask(app, "/tides")
@@ -143,15 +183,15 @@ def start_skill():
 def announceTides(tide):
     if tide == "high":
         if hightides == 1:
-            tideinfo = next_hightide12H
+            tideinfo = next_hightidetime
         else:
-            tideinfo = "Today's high tide is at " + next_hightide12H
+            tideinfo = "Today's high tide is at " + next_hightidetime
 
     if tide == "low":
         if lowtides == 1:
-            tideinfo = next_lowtide12H
+            tideinfo = next_lowtidetime
         else:
-            tideinfo = "Today's low tide is at " + next_lowtide12H
+            tideinfo = "Today's low tide is at " + next_lowtidetime
     return statement('{}'.format(tideinfo))
 
 @ask.intent("CurrentState")
