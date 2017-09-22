@@ -42,15 +42,26 @@ def parseTides():
     time12h = time.strftime("%I:%M %p")
     time24h = time.strptime(time12h, '%I:%M %p')
     currenttime = time.strftime('%H:%M', time24h)
-    global next_tide = ""
-    global next_tidetime = ""
-    global last_tide = ""
-    global last_tidetime = ""
-    global next_hightidetime = ""
-    global next_lowtidetime = ""
-    global tide_state = ""
-    global lowtides = 0
-    global hightides = 0
+    global next_tide
+    global next_tidetime
+    global last_tide
+    global last_tidetime
+    global last_tidetime
+    global next_hightidetime
+    global next_lowtidetime
+    global tide_state
+    global lowtides
+    global hightides
+
+    next_tide = ""
+    next_tidetime = ""
+    last_tide = ""
+    last_tidetime = ""
+    next_hightidetime = ""
+    next_lowtidetime = ""
+    tide_state = ""
+    lowtides = 0
+    hightides = 0
     tideslen = len(tides)
 
     # as our list is in order we can just itterate it to het next tide
