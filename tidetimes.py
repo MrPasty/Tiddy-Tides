@@ -9,10 +9,31 @@ import requests
 import time
 import unidecode
 
+
+
+next_tide = ""
+next_tidetime = ""
+last_tide = ""
+last_tidetime = ""
+next_hightidetime = ""
+next_lowtidetime = ""
+tide_state = ""
+lowtides = 0
+hightides = 0
+
+
 def convert12H(time24):
     time12 = datetime.strptime(time24, "%H:%M")
     time12 = time12.strftime("%I:%M %p")
     return time12
+
+def lastTide(lt):
+    global last_tidetime
+    global last_tide
+    lt = lt.split('#',1)
+    last_tidetime = convert12H(lt[0] )
+    last_tide = lt[1]
+
 
 def parseTides():
     # Get the current time and convert it to 24hours to match tide format
@@ -42,6 +63,7 @@ def parseTides():
     time12h = time.strftime("%I:%M %p")
     time24h = time.strptime(time12h, '%I:%M %p')
     currenttime = time.strftime('%H:%M', time24h)
+    tideslen = len(tides)
     global next_tide
     global next_tidetime
     global last_tide
@@ -52,17 +74,6 @@ def parseTides():
     global tide_state
     global lowtides
     global hightides
-
-    next_tide = ""
-    next_tidetime = ""
-    last_tide = ""
-    last_tidetime = ""
-    next_hightidetime = ""
-    next_lowtidetime = ""
-    tide_state = ""
-    lowtides = 0
-    hightides = 0
-    tideslen = len(tides)
 
     # as our list is in order we can just itterate it to het next tide
     for tide in tides:
@@ -77,10 +88,7 @@ def parseTides():
             next_tide = tidetype
             next_tidetime = convert12H(tidetime)
             # Set the last tide
-            lt = tides[tideindex - 1]
-            lt = lt.split('#',1)
-            last_tidetime = lt[0]
-            last_tide = lt[1]
+            lastTide(tides[tideindex - 1])
             break
         if t.hour == c.hour:
             if t.minute > c.minute:
@@ -88,30 +96,20 @@ def parseTides():
                 next_tide = tidetype
                 next_tidetime = tidetime
                 # Set the last tide
-                lt = tides[tideindex - 1]
-                lt = lt.split('#',1)
-                last_tidetime = lt[0]
-                last_tide = lt[1]
+                lastTide(tides[tideindex - 1])
                 break
 
     if next_tide == "":
         next_tide = "no futher tides today"
-        lt = tides[tideslen-1]
-        lt = lt.split('#',1)
-        last_tidetime = convert12H(lt[0] )
-        last_tide = lt[1]
+        lastTide(tides[tideindex - 1])
     if last_tidetime == "":
         if next_tide == "high":
             last_tide = "low"
-            lt = tides[tideindex - 1]
-            lt = lt.split('#', 1)
-            last_tidetime = convert12H(lt[0])
-
+            lastTide(tides[tideindex - 1])
         else:
             last_tide = "high"
-            lt = tides[tideindex - 1]
-            lt = lt.split('#', 1)
-            last_tidetime = convert12H(lt[0])
+            lastTide(tides[tideindex - 1])
+
 
     # Get next high tide
     for tide in tides:
