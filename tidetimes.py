@@ -170,21 +170,20 @@ def parseTides():
 
     # Get current state
     if last_tide == "high":
-        if hightides > 0:
             if lowtides == 0:
-                tide_state = "the tide is currently on the way out, ....  and will reach low tide by " + next_lowtidetime
+                tide_state = "high tide was at " + last_tidetime + " so the tide is currently on the way out, ....  and will reach low tide by " + next_lowtidetime
             else:
-                tide_state = "the tide is currently on the way out, ....  and will reach low tide by tomorrow"
+                tide_state = "high tide was at " + last_tidetime + " so the tide is currently on the way out, ....  and will reach low tide by tomorrow"
         else:
-            tide_state = "the tide is currently on the way out, ....  and will reach low tide by " + next_lowtidetime  # convert12H(next_lowtidetime)
+            tide_state = "high tide was at " + last_tidetime + " so the tide is currently on the way out, ....  and will reach low tide by " + next_lowtidetime  # convert12H(next_lowtidetime)
     if last_tide == "low":
         if lowtides > 0:
             if hightides == 0:
-                tide_state = "the tide is currently on the way in, ....  and will reach high tide by " + next_hightidetime
+                tide_state = "low tide was at " + last_tidetime + " so the tide is currently on the way in, ....  and will reach high tide by " + next_hightidetime
             else:
-                tide_state = "the tide is currently on the way in, ....  and will reach high tide by tomorrow"
+                tide_state = "low tide was at " + last_tidetime + " so the tide is currently on the way in, ....  and will reach high tide by tomorrow"
         else:
-            tide_state = "the tide is currently on the way in, ....  and will reach high tide by " + next_hightidetime  # convert12H(next_hightidetime)
+            tide_state = "low tide was at " + last_tidetime + " so the tide is currently on the way in, ....  and will reach high tide by " + next_hightidetime  # convert12H(next_hightidetime)# convert12H(next_hightidetime)
 
     print("Next tide time = ", next_tidetime)
     print("Next tide = ", next_tide)
