@@ -121,9 +121,11 @@ def parseTides():
         if t.hour > c.hour:
             if tidetype == "high":
                 next_hightidetime = convert12H(tidetime)
+                break
         if t.hour == c.hour:
             if t.minute > c.minute:
                 next_hightidetime = convert12H(tidetime)
+                break
 
     # No high tide found so populate variable with last high tide
     if next_hightidetime == "":
@@ -148,9 +150,11 @@ def parseTides():
         if t.hour > c.hour:
             if tidetype == "low":
                 next_lowtidetime = convert12H(tidetime)
+                break
         if t.hour == c.hour:
             if t.minute > c.minute:
                 next_lowtidetime = convert12H(tidetime)
+                break
 
     # No low tide found so populate variable with last low tide
     if next_lowtidetime == "":
