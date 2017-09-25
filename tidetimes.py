@@ -209,6 +209,10 @@ def start_skill():
 @ask.intent("TideIntent", mapping={'tide': 'TideState'})
 def announceTides(tide):
     parseTides()
+    global next_hightidetime
+    global next_lowtidetime
+    global hightides
+    global lowtides
     if tide == "high":
         if hightides == 1:
             tideinfo = next_hightidetime
@@ -225,6 +229,7 @@ def announceTides(tide):
 @ask.intent("CurrentState")
 def CurrentState():
     parseTides()
+    global tide_state
     return statement('{}'.format(tide_state))
 
 if __name__ == '__main__':
