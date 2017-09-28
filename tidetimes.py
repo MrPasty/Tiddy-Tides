@@ -181,7 +181,7 @@ def announceTides(tide):
 
 @ask.intent("CurrentState")
 def CurrentState():
-    action = "state"
+    action = "status"
     tideinfo = parseTides(action)
     return statement('{}'.format(tideinfo))
 
