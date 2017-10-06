@@ -36,7 +36,7 @@ def parseTides(action):
     # Get latest tide times from web
     tides = []
     # Read tide times in to variables to use later - note can pass a date on end of url like ..tide-times-20170918
-    soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/<YOUR RIVER HERE').read(), 'html5lib')
+    soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/st-germans-tide-times').read(), 'html5lib')
     tableState = soup.find("table", {"id": "tidetimes"})
 
     for row in tableState.findAll('tr')[2:]:
@@ -54,6 +54,22 @@ def parseTides(action):
 
     tideslen = len(tides)
 
+    # New code for next high/low tide
+    for tide in tides:
+        tideindex = tides.index(tide)
+        t = tide.split('#', 1)
+        tidetime = t[0]
+        tidetype = t[1]
+        t = datetime.strptime(tidetime, '%H:%M')
+        c = datetime.strptime(currenttime, '%H:%M')
+        if t > c:
+            if tidetype == "low":
+                next_lowtidetime = tidetime
+                next_lowtide_msg = "The next low tide is at "  + convert12H(next_lowtidetime)
+            else:
+                next_hightidetime = tidetime
+                next_hightide_msg = "The next high tide is at " + convert12H(next_hightidetime)
+
 
     # Get current and next tides
     for tide in tides:
@@ -63,17 +79,12 @@ def parseTides(action):
         tidetype = t[1]
         t = datetime.strptime(tidetime, '%H:%M')
         c = datetime.strptime(currenttime, '%H:%M')
+
         if t > c:
             msg = "The next tide is "
             next_tidetime = tidetime
             next_tidetype = tidetype
             next_tide_msg = msg + next_tidetype + " at " + next_tidetime
-            if next_tidetype == "high":
-                next_hightidetime = next_tidetime
-                next_hightide_msg = "High tide is at " + convert12H(next_hightidetime)
-            else:
-                next_lowtidetime = next_tidetime
-                next_hightide_msg = "Low tide is at " + convert12H(next_lowtidetime)
 
             # get current tide
             if tideindex > 1:
@@ -99,16 +110,16 @@ def parseTides(action):
             break
 
         # Check we have a tide details
-        if tideindex == tideslen -1 :
-            lt = tides[tideslen - 1]
-            lt = lt.split('#', 1)
-            last_tidetime = lt[0]
-            last_tidetype = lt[1]
-            if last_tidetype == "low":
-                msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way in and will reach high tide in the morning."
-            else:
-                msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way out and will reach low tide in the morning."
-            current_tide_msg = msg
+    if tideindex == tideslen -1 :
+        lt = tides[tideslen - 1]
+        lt = lt.split('#', 1)
+        last_tidetime = lt[0]
+        last_tidetype = lt[1]
+        if last_tidetype == "low":
+            msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way in and will reach high tide in the morning."
+        else:
+            msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way out and will reach low tide in the morning."
+        current_tide_msg = msg
 
 
     # Check we have values for next low and high tide
@@ -181,7 +192,7 @@ def announceTides(tide):
 
 @ask.intent("CurrentState")
 def CurrentState():
-    action = "status"
+    action = "state"
     tideinfo = parseTides(action)
     return statement('{}'.format(tideinfo))
 
