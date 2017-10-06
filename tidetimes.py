@@ -36,7 +36,7 @@ def parseTides(action):
     # Get latest tide times from web
     tides = []
     # Read tide times in to variables to use later - note can pass a date on end of url like ..tide-times-20170918
-    soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/st-germans-tide-times').read(), 'html5lib')
+    soup = BeautifulSoup(urllib.request.urlopen('https://www.tidetimes.org.uk/<YOUR RIVER HERE').read(), 'html5lib')
     tableState = soup.find("table", {"id": "tidetimes"})
 
     for row in tableState.findAll('tr')[2:]:
