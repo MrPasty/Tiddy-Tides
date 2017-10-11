@@ -109,17 +109,17 @@ def parseTides(action):
                 current_tide_msg = msg
             break
 
-        # Check we have a tide details
-    if tideindex == tideslen -1 :
-        lt = tides[tideslen - 1]
-        lt = lt.split('#', 1)
-        last_tidetime = lt[0]
-        last_tidetype = lt[1]
-        if last_tidetype == "low":
-            msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way in and will reach high tide in the morning."
-        else:
-            msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way out and will reach low tide in the morning."
-        current_tide_msg = msg
+ # Check we have a tide details
+ #   if tideindex == tideslen -1 :
+ #       lt = tides[tideslen - 1]
+ #       lt = lt.split('#', 1)
+ #       last_tidetime = lt[0]
+ #       last_tidetype = lt[1]
+ #       if last_tidetype == "low":
+ #           msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way in and will reach high tide in the morning."
+ #       else:
+ #           msg = "the tide was " + last_tidetype + " at " + convert12H(last_tidetime) + ", .. so is now on the way out and will reach low tide in the morning."
+ #       current_tide_msg = msg
 
 
     # Check we have values for next low and high tide
